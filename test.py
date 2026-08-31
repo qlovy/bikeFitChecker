@@ -40,7 +40,6 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
     frame_count = 0
-    dict_result = {}
     angle_results = {}
 
     left_index = {
