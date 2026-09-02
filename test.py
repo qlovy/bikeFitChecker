@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the YOLO26 pose model
-model = YOLO("yolo26n-pose.pt")
+model = YOLO("yolo26m-pose.pt")
 
 theory_angle = {
     "knee": [140, 150],
@@ -55,12 +55,24 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
     max_knee_angle = 0
     min_hip_angle = 0
 
+    first = True
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
 
         results = model(frame, conf=conf, verbose=False)
+
+        if results[0].keypoints is None or len(results[0].keypoints.xy) == 0:
+            annotated_frame = results[0].plot()
+            out.write(annotated_frame)
+
+            frame_count += 1
+            if frame_count % 30 == 0:
+                print(f"  Processed {frame_count}/{total} frames...")
+
+            continue
 
         xy_val = results[0].keypoints.xy[0]
 
@@ -76,7 +88,7 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
         knee_angle = get_angle_between(left_xy["ankle"], left_xy["knee"], left_xy["hip"])
         hip_angle = get_angle_between(left_xy["knee"], left_xy["hip"], left_xy["shoulder"])
 
-        if frame_count == 0:
+        if first:
             angle_results = {
                 "knee": knee_angle,
                 "hip": hip_angle,
@@ -85,6 +97,8 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
             }
             max_knee_angle = knee_angle
             min_hip_angle = hip_angle
+
+            first = False
 
         # knee angle is measured at the bottom of the pedal stroke, so max value
         max_knee_angle = knee_angle if (max_knee_angle < knee_angle) else max_knee_angle
@@ -98,6 +112,12 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
         frame_count += 1
         if frame_count % 30 == 0:
             print(f"  Processed {frame_count}/{total} frames...")
+
+        if first:
+            cap.release()
+            out.release()
+            print("Error: no pose/keypoints detected in the video.")
+            return None
 
     angle_results["knee"] = max_knee_angle
     angle_results["hip"] = min_hip_angle
