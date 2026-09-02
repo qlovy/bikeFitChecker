@@ -3,6 +3,7 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Load the YOLO26 pose model
 model = YOLO("yolo26n-pose.pt")
@@ -98,9 +99,8 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
         if frame_count % 30 == 0:
             print(f"  Processed {frame_count}/{total} frames...")
 
-        if frame_count == total:
-            angle_results["knee"] = max_knee_angle
-            angle_results["hip"] = min_hip_angle
+    angle_results["knee"] = max_knee_angle
+    angle_results["hip"] = min_hip_angle
 
     cap.release()
     out.release()
@@ -114,7 +114,7 @@ def get_angle_between(p1, p2, p3):
     dot_prod = np.dot(u1, u2)
     mag_u1 = np.linalg.norm(u1)
     mag_u2 = np.linalg.norm(u2)
-    angle = np.degrees( np.arccos( dot_prod / (mag_u1 * mag_u2) ) )
+    angle = np.degrees( np.arccos( np.clip( dot_prod / (mag_u1 * mag_u2), -1.0, 1.0) ) )
     return angle
 
 def compare_angle(angle, arr_angle):
@@ -124,6 +124,22 @@ def print_result(dict1, dict2):
     print("Results from video analytics: ")
     for key in dict1:
         print(f"  {key} angle = {dict1[key]: .1f}   Interval = {dict2[key][0]} - {dict2[key][1]}   Valid = {compare_angle(dict1[key], theory_angle[key])}")
+
+
+def show_points(p1, p2, p3, hip_angle):
+    plt.plot(p1[0], p1[1], 'ro')
+    plt.plot(p2[0], p2[1], 'go')
+    plt.plot(p3[0], p3[1], 'bo')
+
+    u1 = p1 - p2
+    u2 = p3 - p2
+
+    plt.quiver(p2[0], p2[1], u1[0], u1[1], angles="xy", scale_units="xy", scale=1, color="r")
+    plt.quiver(p2[0], p2[1], u2[0], u2[1], angles="xy", scale_units="xy",scale=1, color="g")
+    plt.axis("equal")
+    plt.gca().invert_yaxis()
+    plt.title(f"Hip angle = {hip_angle:.1f}")
+    plt.show()
 
 measure_angles = run_keypoint_on_video("./video/IMG_0385.MP4", output_path="./output/output.mp4")
 
