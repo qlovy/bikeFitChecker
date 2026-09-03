@@ -5,17 +5,12 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+from bikefit.video_utils import print_app, print_err
+
 # Load the YOLO26 pose model
 model = YOLO("../model/yolo26m-pose.pt")
 
-theory_angle = {
-    "knee": [140, 150],
-    "hip": [45, 60],
-    "elbow": [150, 170],
-    "back": [35, 50]
-}
-
-def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
+def run_keypoint_on_video(video_path, output_path, conf=0.5):
     keypoint_name = [
         "Nose", "Left Eye", "Right Eye", "Left Ear", "Right Ear",
         "Left Shoulder", "Right Shoulder", "Left Elbow", "Right Elbow",
@@ -34,8 +29,9 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    print(f"Processing : {video_path}")
-    print(f"Resolution : {width}x{height} @ {fps}fps | {total} total frames")
+
+    print_app(f"Processing : {video_path}")
+    print_app(f"Resolution : {width}x{height} @ {fps}fps | {total} total frames")
 
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
@@ -70,7 +66,7 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
 
             frame_count += 1
             if frame_count % 30 == 0:
-                print(f"  Processed {frame_count}/{total} frames...")
+                print_app(f"  Processed {frame_count}/{total} frames...")
 
             continue
 
@@ -111,12 +107,12 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
 
         frame_count += 1
         if frame_count % 30 == 0:
-            print(f"  Processed {frame_count}/{total} frames...")
+            print_app(f"  Processed {frame_count}/{total} frames...")
 
         if first:
             cap.release()
             out.release()
-            print("Error: no pose/keypoints detected in the video.")
+            print_err("Error: no pose/keypoints detected in the video.")
             return None
 
     angle_results["knee"] = max_knee_angle
@@ -124,7 +120,7 @@ def run_keypoint_on_video(video_path, output_path="output_video.mp4", conf=0.5):
 
     cap.release()
     out.release()
-    print(f"Done! Output saved to: {output_path}")
+    print_app(f"Done! Output saved to: {output_path}")
     return angle_results
 
 
@@ -136,15 +132,6 @@ def get_angle_between(p1, p2, p3):
     mag_u2 = np.linalg.norm(u2)
     angle = np.degrees( np.arccos( np.clip( dot_prod / (mag_u1 * mag_u2), -1.0, 1.0) ) )
     return angle
-
-def compare_angle(angle, arr_angle):
-    return arr_angle[0] <= angle <= arr_angle[1]
-
-def print_result(dict1, dict2):
-    print("Results from video analytics: ")
-    for key in dict1:
-        print(f"  {key} angle = {dict1[key]: .1f}   Interval = {dict2[key][0]} - {dict2[key][1]}   Valid = {compare_angle(dict1[key], theory_angle[key])}")
-
 
 def show_points(p1, p2, p3, hip_angle):
     plt.plot(p1[0], p1[1], 'ro')
@@ -160,11 +147,3 @@ def show_points(p1, p2, p3, hip_angle):
     plt.gca().invert_yaxis()
     plt.title(f"Hip angle = {hip_angle:.1f}")
     plt.show()
-
-measure_angles = run_keypoint_on_video("../video/IMG_0385.MP4", output_path="./output/output.mp4")
-
-if measure_angles is None:
-    print("Issue with video analytics")
-    exit()
-
-print_result(measure_angles, theory_angle)
