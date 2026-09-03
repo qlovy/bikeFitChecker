@@ -17,3 +17,11 @@ Exemple directory structure :
 └── output/
     └── result.mp4
 ```
+
+## Get Started
+
+To install the dependencies :
+
+````
+pip install -r requirement.txt
+````
