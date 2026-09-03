@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bikefit.video_utils import print_app, print_err, print_progress
+from bikefit.video_utils import print_app, print_err, print_progress, print_success
 
 # Load the YOLO26 pose model
 model = YOLO("../model/yolo26m-pose.pt")
@@ -117,7 +117,7 @@ def run_keypoint_on_video(video_path, output_path, progress_bar, conf=0.5):
 
     cap.release()
     out.release()
-    print_app(f"Done! Output saved to: {output_path}")
+    print_success(f"Done! Output saved to: **{output_path}**")
     return angle_results
 
 

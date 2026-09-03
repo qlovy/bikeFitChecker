@@ -59,5 +59,8 @@ def print_app(text):
 def print_err(text):
     st.error(text)
 
+def print_success(text):
+    st.success(text, icon="✅")
+
 def print_progress(progress_bar, progress):
     progress_bar.progress(int(progress), text=f"Progress: {int(progress)}%")
