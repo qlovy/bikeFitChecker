@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the YOLO26 pose model
-model = YOLO("yolo26m-pose.pt")
+model = YOLO("../model/yolo26m-pose.pt")
 
 theory_angle = {
     "knee": [140, 150],
@@ -161,7 +161,7 @@ def show_points(p1, p2, p3, hip_angle):
     plt.title(f"Hip angle = {hip_angle:.1f}")
     plt.show()
 
-measure_angles = run_keypoint_on_video("./video/IMG_0385.MP4", output_path="./output/output.mp4")
+measure_angles = run_keypoint_on_video("../video/IMG_0385.MP4", output_path="./output/output.mp4")
 
 if measure_angles is None:
     print("Issue with video analytics")
