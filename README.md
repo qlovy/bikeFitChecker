@@ -28,3 +28,8 @@ pip install -r requirement.txt
 
 Other dependencies :
 - [ffmpeg](https://www.ffmpeg.org) (an easy way to do it is by using [chocolatey](https://chocolatey.org))
+
+To run the app
+````
+streamlit run ./app.py
+````
