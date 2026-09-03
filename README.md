@@ -20,8 +20,11 @@ Exemple directory structure :
 
 ## Get Started
 
-To install the dependencies :
+To install python dependencies :
 
 ````
 pip install -r requirement.txt
 ````
+
+Other dependencies :
+- [ffmpeg](https://www.ffmpeg.org) (an easy way to do it is by using [chocolatey](https://chocolatey.org))
