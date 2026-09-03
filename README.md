@@ -1,6 +1,8 @@
 # bikeFitChecker
 From a video of a cyclist pedaling on a home trainer. It will place key point on joint and connect them. With this geomerty, it will extract the key angle of the body position.
 
+App link (deploy with streamlit) : https://bikefitchecker.streamlit.app
+
 ## Usages
 
 The video which will be used for analysis should be in a format .mp4 and in the directory `video`.
