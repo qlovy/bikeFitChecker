@@ -25,7 +25,9 @@ if uploaded_file is not None:
 
     st.write("Video is being processed, please wait...")
 
-    measure_angles = run_keypoint_on_video(input_video, analysed_video)
+    progress_bar = st.progress(0, text="Progress: 0%")
+
+    measure_angles = run_keypoint_on_video(input_video, analysed_video, progress_bar)
 
 
     if measure_angles is None:

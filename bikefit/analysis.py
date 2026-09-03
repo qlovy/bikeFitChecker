@@ -5,12 +5,12 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bikefit.video_utils import print_app, print_err
+from bikefit.video_utils import print_app, print_err, print_progress
 
 # Load the YOLO26 pose model
 model = YOLO("../model/yolo26m-pose.pt")
 
-def run_keypoint_on_video(video_path, output_path, conf=0.5):
+def run_keypoint_on_video(video_path, output_path, progress_bar, conf=0.5):
     keypoint_name = [
         "Nose", "Left Eye", "Right Eye", "Left Ear", "Right Ear",
         "Left Shoulder", "Right Shoulder", "Left Elbow", "Right Elbow",
@@ -30,8 +30,7 @@ def run_keypoint_on_video(video_path, output_path, conf=0.5):
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 
-    print_app(f"Processing : {video_path}")
-    print_app(f"Resolution : {width}x{height} @ {fps}fps | {total} total frames")
+    print_app(f"Processing : **{video_path}** | Resolution : **{width}**x**{height}** @ **{fps}**fps | **{total}** total frames")
 
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
@@ -65,8 +64,7 @@ def run_keypoint_on_video(video_path, output_path, conf=0.5):
             out.write(annotated_frame)
 
             frame_count += 1
-            if frame_count % 30 == 0:
-                print_app(f"  Processed {frame_count}/{total} frames...")
+            print_progress(progress_bar, frame_count/total * 100)
 
             continue
 
@@ -106,8 +104,7 @@ def run_keypoint_on_video(video_path, output_path, conf=0.5):
         out.write(annotated_frame)
 
         frame_count += 1
-        if frame_count % 30 == 0:
-            print_app(f"  Processed {frame_count}/{total} frames...")
+        print_progress(progress_bar, frame_count/total * 100)
 
         if first:
             cap.release()

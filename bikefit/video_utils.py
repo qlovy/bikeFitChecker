@@ -2,6 +2,7 @@ import subprocess
 import pandas as pd
 import numpy as np
 import streamlit as st
+from streamlit.elements import progress
 
 theory_angle = {
     "knee": [140, 150],
@@ -49,11 +50,14 @@ def print_result(dict1, dict2=theory_angle):
     st.markdown("## Results from video analytics: ")
     st.dataframe(df)
 
+def compare_angle(angle, arr_angle):
+    return arr_angle[0] <= angle <= arr_angle[1]
+
 def print_app(text):
     st.markdown(text)
 
 def print_err(text):
     st.error(text)
 
-def compare_angle(angle, arr_angle):
-    return arr_angle[0] <= angle <= arr_angle[1]
+def print_progress(progress_bar, progress):
+    progress_bar.progress(int(progress), text=f"Progress: {int(progress)}%")
